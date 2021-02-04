@@ -7,13 +7,12 @@ __doc__ = r'''
            Created on 04-01-2021
            '''
 
-import os
-import sys
 from notus import PROJECT_NAME
 from draugr import get_backend_module
-__all__=['Class']
 
-Class = get_backend_module(PROJECT_NAME).Class # Change !Class! to backend class   #TODO: NOT DONE!
+__all__ = ['Class']
+
+Class = get_backend_module(PROJECT_NAME).Class  # Change !Class! to backend class   #TODO: NOT DONE!
 del get_backend_module
 
 if __name__ == '__main__':

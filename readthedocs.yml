@@ -1,4 +1,4 @@
-name: apppath
+name: notus
 type: sphinx
 conda:
   file: docs/environment.yml

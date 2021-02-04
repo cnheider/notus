@@ -8,11 +8,9 @@ import pkg_resources
 
 __project__ = 'Notus'
 __author__ = "Christian Heider Nielsen"
-__version__ = "0.4.1"
+__version__ = "0.0.1"
 __doc__ = r"""
 Created on 27/04/2019
-
-A class and a set of functions for providing for system-consensual path for apps to store data, logs, cache...
 
 @author: cnheider
 """
