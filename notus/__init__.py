@@ -50,6 +50,8 @@ else:
 
 
 def get_version(append_time: Any = DEVELOP) -> str:
+    """
+    """
     version = __version__
     if not version:
         version = os.getenv("VERSION", "0.0.0")

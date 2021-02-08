@@ -11,6 +11,8 @@ from notus.win10 import Win10Toaster
 
 
 def main():
+    """
+    """
     import time
 
     toaster = Win10Toaster()

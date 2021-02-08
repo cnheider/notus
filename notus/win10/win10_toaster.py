@@ -12,9 +12,10 @@ __all__ = ["Win10Toaster"]
 import logging
 from os import path, remove
 from pathlib import Path
+from random import randint
 from threading import Thread
 from time import sleep
-from random import randint
+
 from pkg_resources import Requirement, resource_filename
 
 from notus import PROJECT_NAME
@@ -42,7 +43,6 @@ WS_OVERLAPPED = 0x0
 WS_SYSMENU = 0x80000
 """
 
-from ctypes import create_unicode_buffer, windll
 from winsound import SND_FILENAME, PlaySound
 
 from win32api import (
@@ -120,6 +120,8 @@ class Win10Toaster(object):
         """
 
         def inner(*args, **kwargs):
+            """
+            """
             kwargs.update({"callback": callback})
             func(*args, **kwargs)
 
@@ -147,6 +149,8 @@ class Win10Toaster(object):
         self.duration = duration
 
         def callback():
+            """
+            """
             self.duration = 0
 
             if callback_on_click is not None:
@@ -364,9 +368,13 @@ class Win10Toaster(object):
 if __name__ == "__main__":
 
     def main():
+        """
+        """
         import time
 
         def p_callback():
+            """
+            """
             print("clicked toast")
 
         toaster = Win10Toaster()
