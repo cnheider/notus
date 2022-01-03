@@ -215,12 +215,26 @@ from sphinx.util.docfields import TypedField
 
 
 def patched_make_field(self, types, domain, items, **kw):
-    """ """
+    """
+
+    :param self:
+    :param types:
+    :param domain:
+    :param items:
+    :param kw:
+    :return:
+    """
+
     # `kw` catches `env=None` needed for newer sphinx while maintaining
     #  backwards compatibility when passed along further down!
     # #type: (List, unicode, Tuple) -> nodes.field
     def handle_item(fieldarg, content):
-        """ """
+        """
+
+        :param fieldarg:
+        :param content:
+        :return:
+        """
         par = nodes.paragraph()
         par += addnodes.literal_strong("", fieldarg)  # Patch: this line added
         # par.extend(self.make_xrefs(self.rolename, domain, fieldarg,

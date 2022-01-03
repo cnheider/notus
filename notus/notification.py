@@ -13,16 +13,19 @@ from warg import AlsoDecorator
 
 
 def notify(msg: str) -> None:
-    """ """
+    """
+
+    :param msg:
+    """
     try:
         from notus.win10 import win10_toaster
 
-        win10_toaster.Win10Toaster().show_toast(msg, threaded=True)
+        win10_toaster.Win10Toaster().show(msg, threaded=True)
     except Exception as e:
         try:
             from notus.gtk_dbus import gtk_toaster
 
-            gtk_toaster.GtkToast().show_toast(msg)
+            gtk_toaster.GtkToast().show(msg)
         except Exception as e1:
             print(e, e1)
 

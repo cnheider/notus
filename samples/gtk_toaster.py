@@ -12,8 +12,10 @@ import time
 from notus.gtk_dbus.gtk_toaster import GtkToast, init
 
 
-def main():
-    """ """
+def main() -> None:
+    """
+    :rtype: None
+    """
     import gi
 
     gi.require_version("Gtk", "3.0")

@@ -1,12 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import gi
 
-gi.require_version("Gtk", "3.0")
-from gi.repository import GdkPixbuf
+
 import time
+from typing import Optional, Union
 
-import dbus
+from warg import sink
+
+try:
+    import gi
+
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import GdkPixbuf
+
+    import dbus
+except ModuleNotFoundError as e:
+    import sys
+    from warnings import warn
+
+    warn(f"gi not found, maybe use another implementation fitting for your system: {sys.platform}")
+    raise e
 
 __author__ = "Christian Heider Nielsen"
 __doc__ = "Based on the notifications spec at: http://developer.gnome.org/notification-spec/"
@@ -70,27 +83,19 @@ def closed_callback(nid, reason, notifications_registry) -> None:
     del notifications_registry[nid]
 
 
-def no_op(*args):
-    """No-op function for callbacks."""
-    pass
-
-
 # TODO: Object orient globals!
-
-
-class NotSetupError(RuntimeError):
-    """Error raised if you try to communicate with the server before calling
-    :func:`init`."""
-
-    pass
-
-
 class UnconstructedDbusObject(object):
+    class NotSetupError(RuntimeError):
+        """Error raised if you try to communicate with the server before calling
+        :func:`init`."""
+
+        pass
+
     def __getattr__(self, name):
-        raise NotSetupError("You must call toaster.init() first")
+        raise UnconstructedDbusObject.NotSetupError("You must call toaster.init() first")
 
 
-dbus_interface = UnconstructedDbusObject()
+dbus_interface = UnconstructedDbusObject()  # For when init has not been called yet.
 
 
 def init(app_name, mainloop=None):
@@ -195,9 +200,15 @@ class GtkToast(object):
 
     _id = 0
     _timeout = -1  # -1 = server default settings
-    _closed_callback = no_op
+    _closed_callback = sink
 
-    def __init__(self, title, body="", *, icon=""):
+    def __init__(
+        self,
+        title: str = "No title",
+        body: Optional[str] = "No msg",
+        *,
+        icon: Optional[Union[str, GdkPixbuf.Pixbuf]] = "",
+    ):
         self.title = title
         self.body = body
         self._hints = {}
@@ -211,11 +222,16 @@ class GtkToast(object):
         self._actions = {}
         self._data = {}  # Any data the user wants to attach
 
-    def show(self):
+    def show(self, *args):
         """Ask the server to show the notification.
+
+
 
         Call this after you have finished setting any parameters of the
         notification that you want."""
+
+        self.update(*args)
+
         nid = dbus_interface.Notify(
             APP_NAME,  # app_name       (spec names)
             self._id,  # replaces_id
@@ -233,7 +249,9 @@ class GtkToast(object):
             NOTIFICATIONS_REGISTRY[self._id] = self
         return True
 
-    def update(self, title, body="", *, icon=None):
+    def update(
+        self, title: str, body: Optional[str] = "", *, icon: Optional[Union[str, GdkPixbuf.Pixbuf]] = ""
+    ):
         """Replace the summary and body of the notification, and optionally its
         icon. You should call :meth:`show` again after this to display the
         updated notification."""
@@ -379,23 +397,27 @@ class GtkToast(object):
 
 
 if __name__ == "__main__":
-    import gi
 
-    gi.require_version("Gtk", "3.0")
-    from gi.repository import Gtk
+    def main():
+        import gi
 
-    init("Test")
+        gi.require_version("Gtk", "3.0")
+        from gi.repository import Gtk
 
-    helper = Gtk.Button()
-    a_icon = helper.render_icon(Gtk.STOCK_DIALOG_INFO, Gtk.IconSize.DIALOG)
+        init("Test")
 
-    t = GtkToast("Title", "Body")
-    t.set_icon_from_pixbuf(a_icon)
-    for i in range(10):
-        t.title = f"Title{i}"
-        t.body = f"Body{i}"
-        t.show()
-        time.sleep(0.1)
-        if i == 4:
-            a_icon = helper.render_icon(Gtk.STOCK_DIALOG_QUESTION, Gtk.IconSize.DIALOG)
-            t.set_icon_from_pixbuf(a_icon)
+        helper = Gtk.Button()
+        a_icon = helper.render_icon(Gtk.STOCK_DIALOG_INFO, Gtk.IconSize.DIALOG)
+
+        t = GtkToast("Title", "Body")
+        t.set_icon_from_pixbuf(a_icon)
+        for i in range(10):
+            t.title = f"Title{i}"
+            t.body = f"Body{i}"
+            t.show()
+            time.sleep(0.1)
+            if i == 4:
+                a_icon = helper.render_icon(Gtk.STOCK_DIALOG_QUESTION, Gtk.IconSize.DIALOG)
+                t.set_icon_from_pixbuf(a_icon)
+
+    main()
