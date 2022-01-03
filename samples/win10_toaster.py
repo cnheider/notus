@@ -10,11 +10,14 @@ __doc__ = r"""
 from notus.win10 import Win10Toaster
 
 
-def main():
+def main() -> None:
+    """
+    :rtype: None
+    """
     import time
 
     toaster = Win10Toaster()
-    toaster.show_toast("Hello World!!!", "Python is 10 seconds awsm!", duration=10)
+    toaster.show("Hello World!!!", "Python is 10 seconds awsm!", duration=10)
 
     while toaster.notification_active:  # Wait for threaded notification to finish
         time.sleep(0.1)

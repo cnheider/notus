@@ -7,13 +7,15 @@ __doc__ = r"""
            Created on 04-01-2021
            """
 
+import os
+
+from draugr.os_utilities import get_backend_module
 from notus import PROJECT_NAME
-from draugr import get_backend_module
 
 __all__ = ["Class"]
 
 Class = get_backend_module(
-    PROJECT_NAME
+    PROJECT_NAME, os.environ.get("NOTUS_BACKEND", None)
 ).Class  # Change !Class! to backend class   #TODO: NOT DONE!
 del get_backend_module
 
