@@ -13,8 +13,7 @@ from notus.gtk_dbus.gtk_toaster import GtkToast, init
 
 
 def main():
-    """
-    """
+    """ """
     import gi
 
     gi.require_version("Gtk", "3.0")

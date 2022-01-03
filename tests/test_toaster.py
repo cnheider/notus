@@ -76,9 +76,7 @@ class NotificationTests(unittest.TestCase):
         nu.close()
 
     def test_update(self):
-        n = toaster.GtkToast(
-            "First message", "Some text", icon="notification-message-im"
-        )
+        n = toaster.GtkToast("First message", "Some text", icon="notification-message-im")
         n.show()
 
         # The icon should stay the same with this

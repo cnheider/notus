@@ -15,9 +15,7 @@ __all__ = ["main"]
 def main():
     """"""
     parser = argparse.ArgumentParser(description="Apppath Open Path")
-    parser.add_argument(
-        "APP_NAME", metavar="Name", type=str, help="App name to open AppPath for"
-    )
+    parser.add_argument("APP_NAME", metavar="Name", type=str, help="App name to open AppPath for")
     parser.add_argument(
         "--DIR",
         "-d",
@@ -41,10 +39,7 @@ def main():
     else:
         raise NotADirectoryError(args.DIR)
 
-    print(
-        f"Opening the directory ({dir_})"
-        f" of the {args.APP_NAME} app using the default filemanager"
-    )
+    print(f"Opening the directory ({dir_})" f" of the {args.APP_NAME} app using the default filemanager")
 
     if sys.platform == "win32":
         subprocess.Popen(["start", dir_], shell=True)

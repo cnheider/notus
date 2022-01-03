@@ -9,9 +9,7 @@ import time
 import dbus
 
 __author__ = "Christian Heider Nielsen"
-__doc__ = (
-    "Based on the notifications spec at: http://developer.gnome.org/notification-spec/"
-)
+__doc__ = "Based on the notifications spec at: http://developer.gnome.org/notification-spec/"
 __version__ = "0.0.1"
 
 EXPIRES_DEFAULT = -1
@@ -127,12 +125,8 @@ def init(app_name, mainloop=None):
 
     bus = dbus.SessionBus(mainloop=mainloop)
 
-    dbus_obj = bus.get_object(
-        "org.freedesktop.Notifications", "/org/freedesktop/Notifications"
-    )
-    dbus_interface = dbus.Interface(
-        dbus_obj, dbus_interface="org.freedesktop.Notifications"
-    )
+    dbus_obj = bus.get_object("org.freedesktop.Notifications", "/org/freedesktop/Notifications")
+    dbus_interface = dbus.Interface(dbus_obj, dbus_interface="org.freedesktop.Notifications")
     APP_NAME = app_name
     IS_SETUP = True
 

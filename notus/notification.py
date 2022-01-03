@@ -13,8 +13,7 @@ from warg import AlsoDecorator
 
 
 def notify(msg: str) -> None:
-    """
-    """
+    """ """
     try:
         from notus.win10 import win10_toaster
 
