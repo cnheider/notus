@@ -18,11 +18,15 @@ except ModuleNotFoundError as e:
     import sys
     from warnings import warn
 
-    warn(f"gi not found, maybe use another implementation fitting for your system: {sys.platform}")
+    warn(
+        f"gi not found, maybe use another implementation fitting for your system: {sys.platform}"
+    )
     raise e
 
 __author__ = "Christian Heider Nielsen"
-__doc__ = "Based on the notifications spec at: http://developer.gnome.org/notification-spec/"
+__doc__ = (
+    "Based on the notifications spec at: http://developer.gnome.org/notification-spec/"
+)
 __version__ = "0.0.1"
 
 EXPIRES_DEFAULT = -1
@@ -92,7 +96,9 @@ class UnconstructedDbusObject(object):
         pass
 
     def __getattr__(self, name):
-        raise UnconstructedDbusObject.NotSetupError("You must call toaster.init() first")
+        raise UnconstructedDbusObject.NotSetupError(
+            "You must call toaster.init() first"
+        )
 
 
 dbus_interface = UnconstructedDbusObject()  # For when init has not been called yet.
@@ -130,8 +136,12 @@ def init(app_name, mainloop=None):
 
     bus = dbus.SessionBus(mainloop=mainloop)
 
-    dbus_obj = bus.get_object("org.freedesktop.Notifications", "/org/freedesktop/Notifications")
-    dbus_interface = dbus.Interface(dbus_obj, dbus_interface="org.freedesktop.Notifications")
+    dbus_obj = bus.get_object(
+        "org.freedesktop.Notifications", "/org/freedesktop/Notifications"
+    )
+    dbus_interface = dbus.Interface(
+        dbus_obj, dbus_interface="org.freedesktop.Notifications"
+    )
     APP_NAME = app_name
     IS_SETUP = True
 
@@ -250,7 +260,11 @@ class GtkToast(object):
         return True
 
     def update(
-        self, title: str, body: Optional[str] = "", *, icon: Optional[Union[str, GdkPixbuf.Pixbuf]] = ""
+        self,
+        title: str,
+        body: Optional[str] = "",
+        *,
+        icon: Optional[Union[str, GdkPixbuf.Pixbuf]] = "",
     ):
         """Replace the summary and body of the notification, and optionally its
         icon. You should call :meth:`show` again after this to display the
@@ -417,7 +431,9 @@ if __name__ == "__main__":
             t.show()
             time.sleep(0.1)
             if i == 4:
-                a_icon = helper.render_icon(Gtk.STOCK_DIALOG_QUESTION, Gtk.IconSize.DIALOG)
+                a_icon = helper.render_icon(
+                    Gtk.STOCK_DIALOG_QUESTION, Gtk.IconSize.DIALOG
+                )
                 t.set_icon_from_pixbuf(a_icon)
 
     main()

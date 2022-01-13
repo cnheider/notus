@@ -174,7 +174,9 @@ class Win10Toaster(object):
         except Exception as e:
             logging.error("Some trouble with classAtom (%s)", e)
         style = WS_OVERLAPPED | WS_SYSMENU
-        buttonStyle = WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON  # TODO: Unused for know
+        buttonStyle = (
+            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON
+        )  # TODO: Unused for know
         self.window_handle = CreateWindow(
             self.classAtom,
             "Taskbar",
@@ -279,7 +281,9 @@ class Win10Toaster(object):
         if sound_path is not None:  # play the custom sound
             sound_path = path.realpath(sound_path)
             if not path.exists(sound_path):
-                logging.error(f"Some trouble with the sound file ({sound_path}): [Errno 2] No such file")
+                logging.error(
+                    f"Some trouble with the sound file ({sound_path}): [Errno 2] No such file"
+                )
 
             try:
                 PlaySound(sound_path, SND_FILENAME)
@@ -381,7 +385,9 @@ if __name__ == "__main__":
             print("clicked toast")
 
         toaster = Win10Toaster()
-        toaster.show("Hello World", "Python Here!", callback_on_click=p_callback, duration=3)
+        toaster.show(
+            "Hello World", "Python Here!", callback_on_click=p_callback, duration=3
+        )
         toaster.show("Buh", "DOUBLE TROUBLE", duration=2)
         toaster.show(
             "Example two",
@@ -390,7 +396,9 @@ if __name__ == "__main__":
             duration=5,
             threaded=True,
         )
-        toaster.show("Do it", "Good!", icon_path=None, duration=5, threaded=True)  # TODO: MAKE THIS APPEAR!
+        toaster.show(
+            "Do it", "Good!", icon_path=None, duration=5, threaded=True
+        )  # TODO: MAKE THIS APPEAR!
 
         while toaster.notification_active:  # Wait for threaded notification to finish
             time.sleep(0.1)
