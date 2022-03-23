@@ -1,6 +1,6 @@
 # Create an instance
-from notus.google import GoogleToaster
 from exclude.creds import PASS_WORD, USER_NAME
+from notus.google import GoogleToaster
 
 ga = GoogleToaster(USER_NAME, PASS_WORD)
 ga.set_log_level("debug")
