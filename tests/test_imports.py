@@ -11,6 +11,6 @@ __all__ = []
 
 
 def test_import():
-  import notus
+    import notus
 
-  print(notus.__version__)
+    print(notus.__version__)

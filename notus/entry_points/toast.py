@@ -8,9 +8,9 @@ __all__ = ["main"]
 
 
 def main():
-  """"""
-  raise NotImplementedError
+    """"""
+    raise NotImplementedError
 
 
 if __name__ == "__main__":
-  main()
+    main()

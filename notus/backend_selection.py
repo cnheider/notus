@@ -15,9 +15,9 @@ from notus import PROJECT_NAME
 __all__ = ["Class"]
 
 Class = get_backend_module(
-  PROJECT_NAME, os.environ.get("NOTUS_BACKEND", None)
+    PROJECT_NAME, os.environ.get("NOTUS_BACKEND", None)
 ).Class  # Change !Class! to backend class   #TODO: NOT DONE!
 del get_backend_module
 
 if __name__ == "__main__":
-  print(Class.__doc__)
+    print(Class.__doc__)
