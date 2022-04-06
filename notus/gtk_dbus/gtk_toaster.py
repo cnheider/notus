@@ -8,12 +8,17 @@ from typing import Optional, Union
 from warg import sink
 
 try:
-    import gi
+    from warg import is_linux
 
-    gi.require_version("Gtk", "3.0")
-    from gi.repository import GdkPixbuf
+    if is_linux():
+        import gi
 
-    import dbus
+        gi.require_version("Gtk", "3.0")
+        from gi.repository import GdkPixbuf
+
+        import dbus
+    else:
+        raise ImportError("Notus is not running on Linux")
 except ModuleNotFoundError as e:
     import sys
     from warnings import warn
