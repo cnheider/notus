@@ -12,9 +12,11 @@ __all__ = ["Win10Toaster"]
 import logging
 from os import path, remove
 from pathlib import Path
+from random import randint
 from threading import Thread
 from time import sleep
-from random import randint
+from typing import Optional
+
 from pkg_resources import Requirement, resource_filename
 
 from notus import PROJECT_NAME
@@ -42,7 +44,6 @@ WS_OVERLAPPED = 0x0
 WS_SYSMENU = 0x80000
 """
 
-from ctypes import create_unicode_buffer, windll
 from winsound import SND_FILENAME, PlaySound
 
 from win32api import (
@@ -120,6 +121,11 @@ class Win10Toaster(object):
         """
 
         def inner(*args, **kwargs):
+            """
+
+            :param args:
+            :param kwargs:
+            """
             kwargs.update({"callback": callback})
             func(*args, **kwargs)
 
@@ -133,7 +139,7 @@ class Win10Toaster(object):
         duration: float = None,
         sound_path=None,
         callback_on_click: callable = None,
-        tooltip: str = "Tooltip",
+        tooltip: Optional[str] = None,
     ) -> None:
         """Notification settings.
 
@@ -147,10 +153,14 @@ class Win10Toaster(object):
         self.duration = duration
 
         def callback():
+            """ """
             self.duration = 0
 
             if callback_on_click is not None:
                 callback_on_click()
+
+        if tooltip is None:
+            tooltip = PROJECT_NAME
 
         # Register the window class.
         self.window_class = WNDCLASS()
@@ -164,9 +174,7 @@ class Win10Toaster(object):
         except Exception as e:
             logging.error("Some trouble with classAtom (%s)", e)
         style = WS_OVERLAPPED | WS_SYSMENU
-        buttonStyle = (
-            WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON
-        )  # TODO: Unused for know
+        button_style = WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON  # TODO: Unused for now
         self.window_handle = CreateWindow(
             self.classAtom,
             "Taskbar",
@@ -216,27 +224,27 @@ class Win10Toaster(object):
 
         # Set the duration
         """
-    buff = create_unicode_buffer(10)
-    windll.user32.SystemParametersInfoW(SPI_GETMESSAGEDURATION, 0, buff, 0)
-    try:
-      oldlength = int(buff.value.encode("unicode_escape").decode().replace("\\", "0"), 16)
-    except ValueError:
-      oldlength = 5  # Default notification length
+buff = create_unicode_buffer(10)
+windll.user32.SystemParametersInfoW(SPI_GETMESSAGEDURATION, 0, buff, 0)
+try:
+  oldlength = int(buff.value.encode("unicode_escape").decode().replace("\\", "0"), 16)
+except ValueError:
+  oldlength = 5  # Default notification length
 
-    duration_output = windll.user32.SystemParametersInfoW(SPI_SETMESSAGEDURATION, 0, self.duration, SPIF_SENDCHANGE)
-    windll.user32.SystemParametersInfoW(SPI_GETMESSAGEDURATION, 0, buff, 0)
+duration_output = windll.user32.SystemParametersInfoW(SPI_SETMESSAGEDURATION, 0, self.duration, SPIF_SENDCHANGE)
+windll.user32.SystemParametersInfoW(SPI_GETMESSAGEDURATION, 0, buff, 0)
 
-    duration_error = False
-    try:
-      int(buff.value.encode("unicode_escape").decode().replace("\\", "0"), 16)
-    except ValueError:
-      duration_error = True
+duration_error = False
+try:
+  int(buff.value.encode("unicode_escape").decode().replace("\\", "0"), 16)
+except ValueError:
+  duration_error = True
 
-    if duration_output == 0 or self.duration > 255 or duration_error:
-      windll.user32.SystemParametersInfoW(SPI_SETMESSAGEDURATION, 0, oldlength, SPIF_SENDCHANGE)
-      self.active = False
-      raise RuntimeError(f"Some trouble with the duration ({self.duration})"          ": Invalid duration length")
-    """
+if duration_output == 0 or self.duration > 255 or duration_error:
+  windll.user32.SystemParametersInfoW(SPI_SETMESSAGEDURATION, 0, oldlength, SPIF_SENDCHANGE)
+  self.active = False
+  raise RuntimeError(f"Some trouble with the duration ({self.duration})"          ": Invalid duration length")
+"""
 
         title += " " * randint(0, 63 - len(title))
         msg += " " * randint(0, 128 - len(msg))
@@ -271,9 +279,7 @@ class Win10Toaster(object):
         if sound_path is not None:  # play the custom sound
             sound_path = path.realpath(sound_path)
             if not path.exists(sound_path):
-                logging.error(
-                    f"Some trouble with the sound file ({sound_path}): [Errno 2] No such file"
-                )
+                logging.error(f"Some trouble with the sound file ({sound_path}): [Errno 2] No such file")
 
             try:
                 PlaySound(sound_path, SND_FILENAME)
@@ -282,9 +288,9 @@ class Win10Toaster(object):
 
         PumpMessages()
         """
-    # Put the notification duration back to normal
-    SystemParametersInfoW(SPI_SETMESSAGEDURATION, 0, oldlength, SPIF_SENDCHANGE)
-    """
+# Put the notification duration back to normal
+SystemParametersInfoW(SPI_SETMESSAGEDURATION, 0, oldlength, SPIF_SENDCHANGE)
+"""
 
         if duration is not None:  # take a rest then destroy
             # sleep(duration)
@@ -301,18 +307,21 @@ class Win10Toaster(object):
                 pass
         self.active = False
 
-    def show_toast(
+    def show(
         self,
         title: str,
         message: str = "No msg",
-        icon_path: Path = None,
-        duration: float = None,
+        *,
+        icon_path: Optional[Path] = None,
+        duration: Optional[float] = None,
         threaded: bool = False,
-        callback_on_click: callable = None,
+        callback_on_click: Optional[callable] = None,
         wait_for_active_notification: bool = True,
+        tooltip: Optional[str] = None,
     ) -> bool:
         """Notification settings.
 
+        :param tooltip:
         :param wait_for_active_notification:
         :param duration:
         :param threaded:
@@ -322,7 +331,7 @@ class Win10Toaster(object):
         :param icon_path: path to the .ico file to custom notification
         :para mduration:  delay in seconds before notification self-destruction, None for no-self-destruction
         """
-        args = title, message, icon_path, duration, None, callback_on_click
+        args = title, message, icon_path, duration, None, callback_on_click, tooltip
 
         if not threaded:
             self._show_toast(*args)
@@ -364,26 +373,24 @@ class Win10Toaster(object):
 if __name__ == "__main__":
 
     def main():
+        """ """
         import time
 
         def p_callback():
+            """ """
             print("clicked toast")
 
         toaster = Win10Toaster()
-        toaster.show_toast(
-            "Hello World", "Python Here!", callback_on_click=p_callback, duration=3
-        )
-        toaster.show_toast("Buh", "DOUBLE TROUBLE", duration=2)
-        toaster.show_toast(
+        toaster.show("Hello World", "Python Here!", callback_on_click=p_callback, duration=3)
+        toaster.show("Buh", "DOUBLE TROUBLE", duration=2)
+        toaster.show(
             "Example two",
             "This notification is in it's own thread!",
             icon_path=None,
             duration=5,
             threaded=True,
         )
-        toaster.show_toast(
-            "Do it", "Good!", icon_path=None, duration=5, threaded=True
-        )  # TODO: MAKE THIS APPEAR!
+        toaster.show("Do it", "Good!", icon_path=None, duration=5, threaded=True)  # TODO: MAKE THIS APPEAR!
 
         while toaster.notification_active:  # Wait for threaded notification to finish
             time.sleep(0.1)

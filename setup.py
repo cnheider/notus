@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import glob
+import re
 from pathlib import Path
 from typing import IO, List, Sequence, Union
-import re
 
 from setuptools import find_packages, setup
 
 
-def python_version_check(major: int = 3, minor: int = 7):
+def python_version_check(major: int = 3, minor: int = 7) -> None:
+    """
+
+    :param major:
+    :param minor:
+    """
     import sys
 
     assert sys.version_info.major == major and sys.version_info.minor >= minor, (
@@ -18,11 +24,29 @@ def python_version_check(major: int = 3, minor: int = 7):
 
 python_version_check()
 
+
 def read_reqs(file: str, path: Path) -> List[str]:
+    """
+
+    :param file:
+    :param path:
+    :return:
+    """
+
     def readlines_ignore_comments(f: IO):
+        """
+
+        :param f:
+        :return:
+        """
         return [a_ for a_ in f.readlines() if "#" not in a_ and a_]
 
     def recursive_flatten_ignore_str(seq: Sequence) -> Sequence:
+        """
+
+        :param seq:
+        :return:
+        """
         if not seq:  # is empty Sequence
             return seq
         if isinstance(seq[0], str):
@@ -31,16 +55,19 @@ def read_reqs(file: str, path: Path) -> List[str]:
             return (
                 *recursive_flatten_ignore_str(seq[0]),
                 *recursive_flatten_ignore_str(seq[1:]),
-                )
+            )
         return (*seq[:1], *recursive_flatten_ignore_str(seq[1:]))
 
     def unroll_nested_reqs(req_str: str, base_path: Path) -> Sequence:
+        """
+
+        :param req_str:
+        :param base_path:
+        :return:
+        """
         if req_str.startswith("-r"):
             with open(base_path / req_str.strip("-r").strip()) as f:
-                return [
-                    unroll_nested_reqs(req.strip(), base_path)
-                    for req in readlines_ignore_comments(f)
-                    ]
+                return [unroll_nested_reqs(req.strip(), base_path) for req in readlines_ignore_comments(f)]
         else:
             return (req_str,)
 
@@ -49,10 +76,8 @@ def read_reqs(file: str, path: Path) -> List[str]:
         requirements = readlines_ignore_comments(f)
         for requirement in requirements:
             requirements_group.extend(
-                recursive_flatten_ignore_str(
-                    unroll_nested_reqs(requirement.strip(), path)
-                    )
-                )
+                recursive_flatten_ignore_str(unroll_nested_reqs(requirement.strip(), path))
+            )
 
     req_set = set(requirements_group)
     req_set.discard("")
@@ -71,30 +96,54 @@ __author__ = author
 class AppPathPackage:
     @property
     def test_dependencies(self) -> list:
-        return read_reqs("requirements_tests.txt", Path(__file__).parent/'requirements')
+        return read_reqs("requirements_tests.txt", Path(__file__).parent / "requirements")
 
     @property
     def setup_dependencies(self) -> list:
-        return read_reqs("requirements_setup.txt", Path(__file__).parent/'requirements')
+        """
+
+        :return:
+        """
+        return read_reqs("requirements_setup.txt", Path(__file__).parent / "requirements")
 
     @property
     def package_name(self) -> str:
+        """
+
+        :return:
+        """
         return project_name
 
     @property
     def url(self) -> str:
+        """
+
+        :return:
+        """
         return "https://github.com/cnheider/notus"
 
     @property
-    def download_url(self):
-        return self.url + "/releases"
+    def download_url(self) -> str:
+        """
+
+        :return:
+        """
+        return f"{self.url}/releases"
 
     @property
-    def readme_type(self):
+    def readme_type(self) -> str:
+        """
+
+        :return:
+        """
         return "text/markdown"
 
     @property
     def packages(self) -> List[Union[bytes, str]]:
+        """
+
+        :return:
+        """
         return find_packages(
             exclude=[
                 # 'Path/To/Exclude'
@@ -103,31 +152,51 @@ class AppPathPackage:
 
     @property
     def author_name(self) -> str:
+        """
+
+        :return:
+        """
         return author
 
     @property
     def author_email(self) -> str:
+        """
+
+        :return:
+        """
         return "christian.heider@alexandra.dk"
 
     @property
     def maintainer_name(self) -> str:
+        """
+
+        :return:
+        """
         return self.author_name
 
     @property
     def maintainer_email(self) -> str:
+        """
+
+        :return:
+        """
         return self.author_email
 
     @property
     def package_data(self) -> dict:
-        # data = glob.glob('data/', recursive=True)
-        return {
-            # 'PackageName':[
-            # *data
-            #  ]
-        }
+        """
+
+        :return:
+        """
+        data = glob.glob(str(Path.cwd() / "notus" / "data"), recursive=True)
+        return {"notus": [*data]}
 
     @property
     def entry_points(self) -> dict:
+        """
+
+        :return:
+        """
         return {
             "console_scripts": [
                 # "name_of_executable = module.with:function_to_execute"
@@ -137,9 +206,13 @@ class AppPathPackage:
 
     @property
     def extras(self) -> dict:
+        """
+
+        :return:
+        """
         these_extras = {
             # 'ExtraName':['package-name; platform_system == "System(Linux,Windows)"'
-            }
+        }
 
         path: Path = Path(__file__).parent / "requirements"
 
@@ -157,28 +230,52 @@ class AppPathPackage:
 
     @property
     def requirements(self) -> list:
+        """
+
+        :return:
+        """
         return read_reqs("requirements.txt", Path(__file__).parent)
 
     @property
     def description(self) -> str:
+        """
+
+        :return:
+        """
         return "A package for providing a system notification interface"
 
     @property
     def readme(self) -> str:
+        """
+
+        :return:
+        """
         with open("README.md", encoding="utf8") as f:
             return f.read()
 
     @property
     def keyword(self) -> str:
+        """
+
+        :return:
+        """
         with open("KEYWORDS.md") as f:
             return f.read()
 
     @property
     def license(self) -> str:
+        """
+
+        :return:
+        """
         return "Apache License, Version 2.0"
 
     @property
     def classifiers(self) -> List[str]:
+        """
+
+        :return:
+        """
         return [
             "Development Status :: 4 - Beta",
             "Environment :: Console",
@@ -197,11 +294,14 @@ class AppPathPackage:
 
     @property
     def version(self) -> str:
+        """
+
+        :return:
+        """
         return version
 
 
 if __name__ == "__main__":
-
     pkg = AppPathPackage()
 
     setup(
