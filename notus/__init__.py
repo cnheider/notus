@@ -8,7 +8,7 @@ import pkg_resources
 
 __project__ = "Notus"
 __author__ = "Christian Heider Nielsen"
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 __doc__ = r"""
 Created on 27/04/2019
 

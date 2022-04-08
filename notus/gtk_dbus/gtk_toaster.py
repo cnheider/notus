@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+__author__ = "Christian Heider Nielsen"
+__doc__ = r"""Based on the notifications spec at: http://developer.gnome.org/notification-spec/ 
+         
+            Created on 25-10-2020
+           """
+__all__ = ["GtkToast"]
 
 import time
 from typing import Optional, Union
 
-from warg import sink
+from warg import sink, is_linux
+
 
 try:
-    from warg import is_linux
-
     if is_linux():
         import gi
 
@@ -26,9 +31,6 @@ except ModuleNotFoundError as e:
     warn(f"gi not found, maybe use another implementation fitting for your system: {sys.platform}")
     raise e
 
-__author__ = "Christian Heider Nielsen"
-__doc__ = "Based on the notifications spec at: http://developer.gnome.org/notification-spec/"
-__version__ = "0.0.1"
 
 EXPIRES_DEFAULT = -1
 EXPIRES_NEVER = 0
@@ -43,8 +45,6 @@ APP_NAME = f"unnamed_app_{time.time()}"
 HAVE_MAINLOOP = False
 
 NOTIFICATIONS_REGISTRY = {}
-
-__all__ = ["GtkToast"]
 
 
 def action_callback(nid, action, notifications_registry) -> None:
